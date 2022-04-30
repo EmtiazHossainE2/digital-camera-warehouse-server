@@ -32,6 +32,16 @@ async function run() {
             res.send(products)
         })
 
+        // my items 
+        app.get('/my-items' , async(req,res) => {
+            const email = req.query.email ;
+            const query = {email : email} 
+            console.log(query);
+            const cursor = cameraCollection.find(query)
+            const myItems = await cursor.toArray()
+            res.send(myItems)
+        })
+
         //9 get one camera
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
