@@ -41,6 +41,17 @@ async function run() {
         })
 
         // {name,description,price,quantity,img,supplier,afPoints , brand,brandId,modes,movieType,sold,ratings}
+
+
+        //11 delete product 
+        app.delete('/product/:id' , async(req,res) => {
+            const id = req.params.id 
+            const query = {_id:ObjectId(id)}
+            const camera = await cameraCollection.deleteOne(query)
+            res.send(camera)
+        })
+
+
         //10 delivered (update )
         app.put('/product/:id', async (req, res) => {
             const id = req.params.id
@@ -67,14 +78,7 @@ async function run() {
             const result = await cameraCollection.updateOne(filter, updateDoc, options);
             console.log(result);
 
-            // delete product 
-            //11 delete 
-            app.delete('/product/:id', async (req, res) => {
-                const id = req.params.id
-                const query = { _id: ObjectId(id) }
-                const result = await cameraCollection.deleteOne(query)
-                res.send(result)
-            })
+            
 
         })
     }
