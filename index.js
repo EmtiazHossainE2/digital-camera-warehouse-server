@@ -76,7 +76,13 @@ async function run() {
                 },
             };
             const result = await cameraCollection.updateOne(filter, updateDoc, options);
-            console.log(result);
+            
+            // Stoke item api 
+            app.post('/product' , async(req,res) => {
+                const cameraInfo = req.body 
+                const stokeCamera = await cameraCollection.insertOne(cameraInfo)
+                res.send(stokeCamera)
+            })
 
             
 
