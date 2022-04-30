@@ -25,17 +25,17 @@ async function run() {
         const cameraCollection = client.db("warehouse").collection("camera");
 
         //8 get all camera
-        app.get('/product' , async(req,res) => {
-            const query = {} 
+        app.get('/product', async (req, res) => {
+            const query = {}
             const cursor = cameraCollection.find(query)
             const products = await cursor.toArray()
             res.send(products)
         })
 
         //9 get one camera
-        app.get('/product/:id' , async(req,res) => {
-            const id = req.params.id ;
-            const query = {_id : ObjectId(id)};
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
             const camera = await cameraCollection.findOne(query)
             res.send(camera)
         })
@@ -50,7 +50,7 @@ async function run() {
             const updateDoc = {
                 $set: {
                     name: updateCamera.name,
-                    description : updateCamera.description,
+                    description: updateCamera.description,
                     price: updateCamera.price,
                     quantity: updateCamera.quantity,
                     img: updateCamera.img,
@@ -66,6 +66,15 @@ async function run() {
             };
             const result = await cameraCollection.updateOne(filter, updateDoc, options);
             console.log(result);
+
+            // delete product 
+            //11 delete 
+            app.delete('/product/:id', async (req, res) => {
+                const id = req.params.id
+                const query = { _id: ObjectId(id) }
+                const result = await cameraCollection.deleteOne(query)
+                res.send(result)
+            })
 
         })
     }
