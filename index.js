@@ -40,6 +40,13 @@ async function run() {
             res.send(camera)
         })
 
+        //12 Stoke item api 
+        app.post('/product' , async(req,res) => {
+            const product = req.body 
+            const result = await serviceCollection.insertOne(product)
+            res.send(result)
+        })
+
         // {name,description,price,quantity,img,supplier,afPoints , brand,brandId,modes,movieType,sold,ratings}
 
 
@@ -77,13 +84,6 @@ async function run() {
             };
             const result = await cameraCollection.updateOne(filter, updateDoc, options);
             
-            // Stoke item api 
-            app.post('/product' , async(req,res) => {
-                const cameraInfo = req.body 
-                const stokeCamera = await cameraCollection.insertOne(cameraInfo)
-                res.send(stokeCamera)
-            })
-
             
 
         })
