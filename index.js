@@ -43,7 +43,7 @@ async function run() {
         //12 Stoke item api 
         app.post('/product' , async(req,res) => {
             const product = req.body 
-            const result = await serviceCollection.insertOne(product)
+            const result = await cameraCollection.insertOne(product)
             res.send(result)
         })
 
