@@ -32,7 +32,7 @@ async function run() {
             res.send(products)
         })
 
-        //get one camera
+        //9 get one camera
         app.get('/product/:id' , async(req,res) => {
             const id = req.params.id ;
             const query = {_id : ObjectId(id)};
@@ -41,7 +41,7 @@ async function run() {
         })
 
         // {name,description,price,quantity,img,supplier,afPoints , brand,brandId,modes,movieType,sold,ratings}
-        //11 delivered (update )
+        //10 delivered (update )
         app.put('/product/:id', async (req, res) => {
             const id = req.params.id
             const updateCamera = req.body
@@ -68,9 +68,6 @@ async function run() {
             console.log(result);
 
         })
-
-
-
     }
 
     finally {
