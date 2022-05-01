@@ -93,9 +93,8 @@ async function run() {
                 },
             };
             const result = await cameraCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
             
-            
-
         })
     }
 
