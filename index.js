@@ -26,13 +26,23 @@ async function run() {
 
         //8 get all camera
         app.get('/product', async (req, res) => {
+            //15 pagination 
+            const page = parseInt(req.query.page)
+            const pageProduct = parseInt(req.query.pageProduct)
             const query = {}
             const cursor = cameraCollection.find(query)
-            const products = await cursor.toArray()
+            let products ;
+            if(page || pageProduct){
+                products = await cursor.skip(page*pageProduct).limit(pageProduct).toArray()
+            }
+            else{
+                products = await cursor.toArray()
+            }
             res.send(products)
+            
         })
 
-        // my items 
+        //13 my items 
         app.get('/my-items' , async(req,res) => {
             const email = req.query.email ;
             const query = {email : email} 
@@ -77,25 +87,21 @@ async function run() {
             const options = { upsert: true };
             const updateDoc = {
                 $set: {
-                    name: updateCamera.name,
-                    description: updateCamera.description,
-                    price: updateCamera.price,
                     quantity: updateCamera.quantity,
-                    img: updateCamera.img,
-                    supplier: updateCamera.supplier,
-                    afPoints: updateCamera.afPoints,
-                    modes: updateCamera.modes,
-                    movieType: updateCamera.movieType,
-                    brand: updateCamera.brand,
-                    brandId: updateCamera.brandId,
-                    sold: updateCamera.sold,
-                    ratings: updateCamera.ratings
                 },
             };
             const result = await cameraCollection.updateOne(filter, updateDoc, options);
             res.send(result)
             
         })
+
+        //14 pagination    
+        app.get('/cameraCollection', async (req, res) => {
+            const count = await cameraCollection.estimatedDocumentCount()
+            res.send({ count })
+        })
+
+
     }
 
     finally {
