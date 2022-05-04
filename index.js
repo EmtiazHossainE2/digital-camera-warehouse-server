@@ -1,5 +1,6 @@
 //1
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000
@@ -44,6 +45,8 @@ async function run() {
 
         //13 my items 
         app.get('/my-items' , async(req,res) => {
+            const headerAuth = req.headers.authorization
+            console.log(headerAuth);
             const email = req.query.email ;
             const query = {email : email} 
             console.log(query);
@@ -88,6 +91,19 @@ async function run() {
             const updateDoc = {
                 $set: {
                     quantity: updateCamera.quantity,
+                    // name: updateCamera.name,
+                    // description: updateCamera.description,
+                    // price: updateCamera.price,
+                    // quantity: updateCamera.quantity,
+                    // img: updateCamera.img,
+                    // supplier: updateCamera.supplier,
+                    // afPoints: updateCamera.afPoints,
+                    // modes: updateCamera.modes,
+                    // movieType: updateCamera.movieType,
+                    // brand: updateCamera.brand,
+                    // brandId: updateCamera.brandId,
+                    // sold: updateCamera.sold,
+                    // ratings: updateCamera.ratings
                 },
             };
             const result = await cameraCollection.updateOne(filter, updateDoc, options);
@@ -99,6 +115,13 @@ async function run() {
         app.get('/cameraCollection', async (req, res) => {
             const count = await cameraCollection.estimatedDocumentCount()
             res.send({ count })
+        })
+
+        //15 jwt (json web token)
+        app.post('/login' , async(req,res) =>{
+            const user = req.body 
+            const accessToken = jwt.sign(user , process.env.ACCESS_TOKEN_SECRET , {expiresIn : '1d'})
+            res.send(accessToken)
         })
 
 
