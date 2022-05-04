@@ -13,6 +13,23 @@ require('dotenv').config()
 app.use(cors())
 app.use(express.json())
 
+//jwt 
+const verifyToken = (req, res, next) => {
+    const headerAuth = req.headers.authorization
+    if (!headerAuth) {
+        return res.status(401).send({ message: 'Unauthorized Access' });
+    }
+    const token = headerAuth.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: 'Forbidden Access' });
+        }
+        req.decoded = decoded;
+        next()
+    })
+}
+
+
 //5 mongo connect
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ntqc6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -32,27 +49,30 @@ async function run() {
             const pageProduct = parseInt(req.query.pageProduct)
             const query = {}
             const cursor = cameraCollection.find(query)
-            let products ;
-            if(page || pageProduct){
-                products = await cursor.skip(page*pageProduct).limit(pageProduct).toArray()
+            let products;
+            if (page || pageProduct) {
+                products = await cursor.skip(page * pageProduct).limit(pageProduct).toArray()
             }
-            else{
+            else {
                 products = await cursor.toArray()
             }
             res.send(products)
-            
+
         })
 
         //13 my items 
-        app.get('/my-items' , async(req,res) => {
-            const headerAuth = req.headers.authorization
-            console.log(headerAuth);
-            const email = req.query.email ;
-            const query = {email : email} 
-            console.log(query);
-            const cursor = cameraCollection.find(query)
-            const myItems = await cursor.toArray()
-            res.send(myItems)
+        app.get('/my-items', verifyToken, async (req, res) => {
+            const decodeEmail = req.decoded.email
+            const email = req.query.email;
+            if (email === decodeEmail) {
+                const query = { email: email }
+                const cursor = cameraCollection.find(query)
+                const myItems = await cursor.toArray()
+                res.send(myItems)
+            }
+            else{
+                res.status(403).send({message: 'Forbidden Access'})
+            }
         })
 
         //9 get one camera
@@ -64,8 +84,8 @@ async function run() {
         })
 
         //12 Stoke item api 
-        app.post('/product' , async(req,res) => {
-            const product = req.body 
+        app.post('/product', async (req, res) => {
+            const product = req.body
             const result = await cameraCollection.insertOne(product)
             res.send(result)
         })
@@ -74,9 +94,9 @@ async function run() {
 
 
         //11 delete product 
-        app.delete('/product/:id' , async(req,res) => {
-            const id = req.params.id 
-            const query = {_id:ObjectId(id)}
+        app.delete('/product/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
             const camera = await cameraCollection.deleteOne(query)
             res.send(camera)
         })
@@ -108,7 +128,7 @@ async function run() {
             };
             const result = await cameraCollection.updateOne(filter, updateDoc, options);
             res.send(result)
-            
+
         })
 
         //14 pagination    
@@ -118,9 +138,9 @@ async function run() {
         })
 
         //15 jwt (json web token)
-        app.post('/login' , async(req,res) =>{
-            const user = req.body 
-            const accessToken = jwt.sign(user , process.env.ACCESS_TOKEN_SECRET , {expiresIn : '1d'})
+        app.post('/login', async (req, res) => {
+            const user = req.body
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
             res.send(accessToken)
         })
 
